@@ -7,19 +7,19 @@ has a stable `id`, a `data-testid`, and an accessible label.
 
 ## Routes
 
-| Route       | Description                                       |
-|-------------|---------------------------------------------------|
-| `/`         | Hero carousel + About section with CTAs           |
-| `/gallery`  | Filterable masonry gallery with lightbox          |
-| `/contact`  | Contact info, newsletter signup, reviews          |
+| Route      | Description                              |
+| ---------- | ---------------------------------------- |
+| `/`        | Hero carousel + About section with CTAs  |
+| `/gallery` | Filterable masonry gallery with lightbox |
+| `/contact` | Contact info, newsletter signup, reviews |
 
 ## API Endpoints (mock)
 
-| Method | Path                  | Purpose                                        |
-|--------|-----------------------|------------------------------------------------|
-| POST   | `/api/newsletter`     | Subscribe + log a "sent" welcome email         |
-| GET    | `/api/test/emails`    | Returns all sent emails (for QA verification)  |
-| DELETE | `/api/test/emails`    | Clears the in-memory mock email store          |
+| Method | Path               | Purpose                                       |
+| ------ | ------------------ | --------------------------------------------- |
+| POST   | `/api/newsletter`  | Subscribe + log a "sent" welcome email        |
+| GET    | `/api/test/emails` | Returns all sent emails (for QA verification) |
+| DELETE | `/api/test/emails` | Clears the in-memory mock email store         |
 
 ## Configuring images
 
@@ -51,18 +51,29 @@ update the `imageUrl` field — no other changes required.
 - Skip-to-content link, semantic landmarks, full keyboard navigation
 - Smooth scrolling, lazy-loaded images, restrained transitions
 
+## Setup
+
+```bash
+npm install
+cd playwright && npm install && cd ..
+```
+
 ## Running the Playwright smoke tests
 
 ```bash
-bunx playwright install chromium   # one-time
-bun run dev                        # start the app (http://localhost:8080)
-bunx playwright test               # in another terminal
+cd playwright
+npx playwright install chromium   # one-time
+npm run dev                       # start the app (http://localhost:8080), in another terminal
+npm run test                      # runs headless
+
+# or via the interactive UI:
+npm run test:ui
 
 # or against a deployed preview:
-PLAYWRIGHT_BASE_URL=https://your-preview.lovable.app bunx playwright test
+PLAYWRIGHT_BASE_URL=https://your.url npm run test
 ```
 
-Specs live in `tests/` and cover:
+Specs live in `playwright/specs/` and cover:
 
 - `home.spec.ts` — header, carousel controls + pagination, CTA navigation
 - `gallery.spec.ts` — grid, category filtering, lightbox open/close (click + Escape)
