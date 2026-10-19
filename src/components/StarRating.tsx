@@ -5,9 +5,11 @@ interface Props {
   value: number;
   onChange: (n: number) => void;
   idPrefix?: string;
+  /** id of an error message describing the group; also marks the group invalid. */
+  describedBy?: string;
 }
 
-export function StarRating({ value, onChange, idPrefix = "rating" }: Props) {
+export function StarRating({ value, onChange, idPrefix = "rating", describedBy }: Props) {
   const [hover, setHover] = useState(0);
   const display = hover || value;
 
@@ -18,6 +20,8 @@ export function StarRating({ value, onChange, idPrefix = "rating" }: Props) {
       data-value={value}
       role="radiogroup"
       aria-label="Star rating"
+      aria-describedby={describedBy}
+      aria-invalid={describedBy ? true : undefined}
       className="inline-flex items-center gap-1"
     >
       {[1, 2, 3, 4, 5].map((n) => {

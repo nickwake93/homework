@@ -18,6 +18,7 @@ export const Route = createFileRoute("/")({
 function Home() {
   return (
     <>
+      <h1 className="sr-only">Nature Frames: nature photography by Nick Wake</h1>
       <HeroCarousel />
 
       <section
