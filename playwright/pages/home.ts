@@ -18,11 +18,6 @@ export class HomePage extends BasePage {
     super(page, "/");
   }
 
-  async goto() {
-    await super.goto();
-    await this.carousel.waitFor();
-  }
-
   activeSlide(): Locator {
     return this.carousel.locator('[data-testid="carousel-slide"][data-active="true"]');
   }
