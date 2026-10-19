@@ -19,7 +19,7 @@ export const emailStore = {
       sentAt: new Date().toISOString(),
     };
     _store.unshift(record);
-    // eslint-disable-next-line no-console
+
     console.log("[mock-email] sent:", record);
     return record;
   },

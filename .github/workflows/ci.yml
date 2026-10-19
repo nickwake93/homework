@@ -33,8 +33,14 @@ jobs:
         working-directory: playwright
         run: npm ci
 
+      - name: Lint app
+        run: npm run lint
+
       - name: Typecheck app
-        run: npx tsc --noEmit
+        run: npm run typecheck
+
+      - name: Check app formatting
+        run: npm run format:check
 
       - name: Lint tests
         working-directory: playwright
