@@ -29,7 +29,7 @@ export default [
       "@typescript-eslint/consistent-type-imports": "error",
       "no-console": "warn",
       ...playwright.configs["flat/recommended"].rules,
-      // "playwright/no-raw-locators": "warn", // We should enable this when fixed
+      "playwright/no-raw-locators": ["error", { allowed: ["html"] }],
       "playwright/valid-expect": "error",
       "playwright/prefer-web-first-assertions": "error",
       "playwright/expect-expect": "off", // We often use helper functions that contain the assertions

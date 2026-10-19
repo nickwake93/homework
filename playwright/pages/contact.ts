@@ -2,34 +2,34 @@ import type { Page, Locator } from "@playwright/test";
 import { BasePage } from "../support/base";
 
 export class ContactPage extends BasePage {
-  readonly heading = this.page.getByTestId("contact-heading");
-  readonly phoneLink = this.page.getByTestId("contact-phone-link");
-  readonly emailLink = this.page.getByTestId("contact-email-link");
-  readonly linkedInLink = this.page.getByTestId("contact-linkedin-link");
+  readonly heading = this.page.getByRole("heading", { level: 1, name: "Let's talk" });
 
-  readonly newsletterNameInput = this.page.getByTestId("newsletter-name-input");
-  readonly newsletterEmailInput = this.page.getByTestId("newsletter-email-input");
-  readonly newsletterSubmitButton = this.page.getByTestId("newsletter-submit-button");
-  readonly newsletterNameError = this.page.getByTestId("newsletter-name-error");
-  readonly newsletterEmailError = this.page.getByTestId("newsletter-email-error");
-  readonly newsletterStatus = this.page.getByTestId("newsletter-status");
+  readonly contactInfo = this.page.getByRole("region", { name: "Contact information" });
+  readonly phoneLink = this.contactInfo.getByRole("link", { name: /^Phone/ });
+  readonly emailLink = this.contactInfo.getByRole("link", { name: /^Email/ });
+  readonly linkedInLink = this.contactInfo.getByRole("link", { name: /^LinkedIn/ });
 
-  readonly reviewNameInput = this.page.getByTestId("review-name-input");
-  readonly reviewTextInput = this.page.getByTestId("review-text-input");
-  readonly submitReviewButton = this.page.getByTestId("submit-review-button");
-  readonly reviewNameError = this.page.getByTestId("review-name-error");
-  readonly reviewRatingError = this.page.getByTestId("review-rating-error");
-  readonly reviewTextError = this.page.getByTestId("review-text-error");
-  readonly reviewRatingStars = this.page.getByTestId("review-rating-stars");
-  readonly reviewRatingValue = this.page.getByTestId("review-rating-value");
-  readonly reviewSuccess = this.page.getByTestId("review-success");
-  readonly reviewItems = this.page.getByTestId("review-item");
+  readonly newsletter = this.page.getByRole("region", { name: "Newsletter" });
+  readonly newsletterNameInput = this.newsletter.getByLabel("Name", { exact: true });
+  readonly newsletterEmailInput = this.newsletter.getByLabel("Email", { exact: true });
+  readonly newsletterSubmitButton = this.newsletter.getByRole("button", { name: "Subscribe" });
+  readonly newsletterStatus = this.newsletter.getByRole("status");
+
+  readonly reviews = this.page.getByRole("region", { name: "Reviews" });
+  readonly reviewNameInput = this.reviews.getByLabel("Your name");
+  readonly reviewTextInput = this.reviews.getByLabel("Your review");
+  readonly reviewRating = this.reviews.getByRole("radiogroup", { name: "Star rating" });
+  // Not linked to the radiogroup via aria-describedby, so it can only be found by its text.
+  readonly reviewRatingError = this.reviews.getByRole("alert").filter({ hasText: "rating" });
+  readonly submitReviewButton = this.reviews.getByRole("button", { name: "Submit review" });
+  readonly reviewSuccess = this.reviews.getByRole("status");
+  readonly reviewItems = this.reviews.getByRole("listitem");
 
   constructor(page: Page) {
     super(page, "/contact");
   }
 
   ratingStar(n: number): Locator {
-    return this.page.getByTestId(`review-rating-star-${n}`);
+    return this.reviewRating.getByRole("radio", { name: n === 1 ? "1 star" : `${n} stars` });
   }
 }
