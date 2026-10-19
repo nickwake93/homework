@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { galleryCategories, galleryImages, type GalleryImage } from "@/lib/gallery-data";
 
@@ -19,6 +19,11 @@ export const Route = createFileRoute("/gallery")({
 function GalleryPage() {
   const [active, setActive] = useState<(typeof galleryCategories)[number]>("All");
   const [lightbox, setLightbox] = useState<GalleryImage | null>(null);
+  // Focus management for the modal: focus moves into it on open and back to the card that
+  // opened it on close. The opener is stored explicitly because Safari doesn't focus
+  // buttons on mouse click, so document.activeElement can't be relied on.
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
 
   const visible = useMemo(
     () => (active === "All" ? galleryImages : galleryImages.filter((g) => g.category === active)),
@@ -27,14 +32,21 @@ function GalleryPage() {
 
   useEffect(() => {
     if (!lightbox) return;
+    closeButtonRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setLightbox(null);
+      // The close button is the dialog's only focusable element, so Tab stays on it.
+      if (e.key === "Tab") {
+        e.preventDefault();
+        closeButtonRef.current?.focus();
+      }
     };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
+      openerRef.current?.focus();
     };
   }, [lightbox]);
 
@@ -91,7 +103,10 @@ function GalleryPage() {
             data-image-id={img.id}
             data-category={img.category}
             type="button"
-            onClick={() => setLightbox(img)}
+            onClick={(e) => {
+              openerRef.current = e.currentTarget;
+              setLightbox(img);
+            }}
             aria-label={`Open ${img.title}`}
             className="group block w-full overflow-hidden rounded-lg bg-secondary text-left shadow-soft transition hover:shadow-lg break-inside-avoid"
           >
@@ -129,6 +144,7 @@ function GalleryPage() {
           onClick={() => setLightbox(null)}
         >
           <button
+            ref={closeButtonRef}
             id="lightbox-close-button"
             data-testid="lightbox-close-button"
             type="button"

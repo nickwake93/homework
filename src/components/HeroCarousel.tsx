@@ -54,12 +54,12 @@ export function HeroCarousel() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 mx-auto max-w-6xl px-6 pb-16 text-white">
-            <h1
+            <h2
               data-testid="carousel-slide-title"
               className="font-display text-4xl sm:text-6xl md:text-7xl"
             >
               {slide.title}
-            </h1>
+            </h2>
             {slide.subtitle && (
               <p
                 data-testid="carousel-slide-subtitle"
@@ -98,7 +98,7 @@ export function HeroCarousel() {
         data-testid="carousel-pagination"
         role="tablist"
         aria-label="Slide pagination"
-        className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2"
+        className="absolute bottom-4 left-1/2 flex -translate-x-1/2"
       >
         {heroSlides.map((s, i) => (
           <button
@@ -111,10 +111,16 @@ export function HeroCarousel() {
             aria-selected={i === index}
             aria-label={`Go to slide ${i + 1}`}
             onClick={() => go(i)}
-            className={`h-2 rounded-full transition-all ${
-              i === index ? "w-8 bg-white" : "w-2 bg-white/50 hover:bg-white/80"
-            }`}
-          />
+            // 24px hit area (WCAG 2.2 target size) around the small visual dot.
+            className="group flex h-6 min-w-6 items-center justify-center px-1"
+          >
+            <span
+              aria-hidden="true"
+              className={`block h-2 rounded-full transition-all ${
+                i === index ? "w-8 bg-white" : "w-2 bg-white/50 group-hover:bg-white/80"
+              }`}
+            />
+          </button>
         ))}
       </div>
     </section>

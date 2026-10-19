@@ -90,6 +90,8 @@ Specs live in `playwright/specs/`:
 - `ui/gallery.spec.ts` — grid, category filtering, lightbox open/close (click + Escape)
 - `ui/contact.spec.ts` — contact links, newsletter validation + success
   (verified against `GET /api/test/emails`), star rating, review submission
+- `ui/accessibility.spec.ts` — axe (WCAG 2.2 AA + best practice) on every route and
+  interactive state in light and dark mode, single `h1` per page, lightbox focus management
 - `api/newsletter.spec.ts` — `POST /api/newsletter` contract, validation boundaries,
   malformed bodies, 405 for other methods
 - `api/test-api*.spec.ts` — the QA endpoints, including that they 404 with the flag off

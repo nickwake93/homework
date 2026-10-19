@@ -72,7 +72,8 @@ test.describe("Contact", () => {
       await contact.submitReviewButton.click();
 
       await expect(contact.reviewNameInput).toHaveAccessibleDescription("Name is required");
-      await expect(contact.reviewRatingError).toHaveText("Please choose a rating");
+      await expect(contact.reviewRating).toHaveAttribute("aria-invalid", "true");
+      await expect(contact.reviewRating).toHaveAccessibleDescription("Please choose a rating");
       await expect(contact.reviewTextInput).toHaveAccessibleDescription("Review text is required");
     });
 
@@ -96,10 +97,10 @@ test.describe("Contact", () => {
       await expect(contact.reviewSuccess).toHaveText(/review submitted/i);
       await expect(contact.reviewItems).toHaveCount(beforeCount + 1);
 
-      // Review fields have no semantic roles, so the test IDs are the stable handle.
+      // Name and text have no semantic roles, so the test IDs are the stable handle.
       const first = contact.reviewItems.first();
       await expect(first.getByTestId("review-name")).toHaveText("Sam Tester");
-      await expect(first.getByTestId("review-rating")).toHaveAttribute("data-rating", "5");
+      await expect(first.getByRole("img", { name: "5 out of 5 stars" })).toBeVisible();
       await expect(first.getByTestId("review-text")).toHaveText(
         "Beautiful prints, fast turnaround.",
       );

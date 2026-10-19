@@ -340,7 +340,12 @@ function ReviewsSection() {
           </div>
           <div>
             <span className="mb-1 block text-sm font-medium">Rating</span>
-            <StarRating value={rating} onChange={setRating} idPrefix="review-rating" />
+            <StarRating
+              value={rating}
+              onChange={setRating}
+              idPrefix="review-rating"
+              describedBy={errors.rating ? "review-rating-error" : undefined}
+            />
             <input
               type="hidden"
               id="review-rating-value"
@@ -435,6 +440,7 @@ function ReviewsSection() {
             <div
               data-testid="review-rating"
               data-rating={r.rating}
+              role="img"
               aria-label={`${r.rating} out of 5 stars`}
               className="mt-1 flex gap-0.5 text-amber-500"
             >
