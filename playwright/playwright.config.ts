@@ -57,11 +57,11 @@ export default defineConfig({
         },
       ],
   projects: [
-    {
-      name: "chromium",
-      testMatch: UI_SPECS,
-      use: { ...devices["Desktop Chrome"] },
-    },
+    { name: "chromium", testMatch: UI_SPECS, use: { ...devices["Desktop Chrome"] } },
+    { name: "firefox", testMatch: UI_SPECS, use: { ...devices["Desktop Firefox"] } },
+    { name: "webkit", testMatch: UI_SPECS, use: { ...devices["Desktop Safari"] } },
+    { name: "mobile-chrome", testMatch: UI_SPECS, use: { ...devices["Pixel 7"] } },
+    { name: "mobile-safari", testMatch: UI_SPECS, use: { ...devices["iPhone 15"] } },
     {
       // HTTP-only: these specs use the `request` fixture, so no browser is launched.
       name: "api",

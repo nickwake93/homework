@@ -32,6 +32,7 @@ export default [
       "playwright/no-raw-locators": ["error", { allowed: ["html"] }],
       "playwright/valid-expect": "error",
       "playwright/prefer-web-first-assertions": "error",
+      "playwright/no-skipped-test": ["warn", { allowConditional: true }],
       "playwright/expect-expect": "off", // We often use helper functions that contain the assertions
     },
   },

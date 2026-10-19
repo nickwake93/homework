@@ -1,10 +1,15 @@
 import { expect, type Page } from "@playwright/test";
+import { SiteNav } from "../pages/components/siteNav";
 
 export abstract class BasePage {
+  readonly nav: SiteNav;
+
   constructor(
     readonly page: Page,
     private readonly path: string,
-  ) {}
+  ) {
+    this.nav = new SiteNav(page);
+  }
 
   /**
    * Navigate and wait until React has hydrated. The app is server-rendered, so

@@ -3,9 +3,6 @@ import { expect } from "@playwright/test";
 import { BasePage } from "../support/base";
 
 export class HomePage extends BasePage {
-  readonly siteHeader = this.page.getByRole("banner");
-  readonly primaryNav = this.page.getByRole("navigation", { name: "Primary" });
-
   readonly carousel = this.page.getByRole("region", { name: "Featured photography" });
   // Inactive slides are aria-hidden, so only the visible slide is in the accessibility tree.
   readonly activeSlide = this.carousel.getByRole("article");
@@ -34,8 +31,8 @@ export class HomePage extends BasePage {
   }
 
   async checkBaseElements() {
-    await expect(this.siteHeader).toBeVisible();
-    await expect(this.primaryNav).toBeVisible();
+    await expect(this.nav.header).toBeVisible();
+    await expect(this.nav.nav).toBeVisible();
     await expect(this.carousel).toBeVisible();
     await expect(this.aboutHeading).toBeVisible();
     await expect(this.ctaViewGallery).toBeVisible();
