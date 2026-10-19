@@ -19,8 +19,6 @@ export class ContactPage extends BasePage {
   readonly reviewNameInput = this.reviews.getByLabel("Your name");
   readonly reviewTextInput = this.reviews.getByLabel("Your review");
   readonly reviewRating = this.reviews.getByRole("radiogroup", { name: "Star rating" });
-  // Not linked to the radiogroup via aria-describedby, so it can only be found by its text.
-  readonly reviewRatingError = this.reviews.getByRole("alert").filter({ hasText: "rating" });
   readonly submitReviewButton = this.reviews.getByRole("button", { name: "Submit review" });
   readonly reviewSuccess = this.reviews.getByRole("status");
   readonly reviewItems = this.reviews.getByRole("listitem");
