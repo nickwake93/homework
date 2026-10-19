@@ -15,7 +15,10 @@ export const Route = createFileRoute("/api/newsletter")({
         const email = (payload.email ?? "").trim();
 
         if (!name || name.length > 100) {
-          return Response.json({ ok: false, error: "Name is required (max 100 chars)" }, { status: 400 });
+          return Response.json(
+            { ok: false, error: "Name is required (max 100 chars)" },
+            { status: 400 },
+          );
         }
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) {
           return Response.json({ ok: false, error: "Valid email is required" }, { status: 400 });

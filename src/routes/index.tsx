@@ -5,7 +5,11 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Nature Frames — Photography Portfolio" },
-      { name: "description", content: "Recreational nature photographer offering commissioned prints and outdoor photography." },
+      {
+        name: "description",
+        content:
+          "Recreational nature photographer offering commissioned prints and outdoor photography.",
+      },
     ],
   }),
   component: Home,
@@ -38,16 +42,29 @@ function Home() {
 
           <div className="fade-in">
             <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">About me</p>
-            <h2 id="about-heading" data-testid="about-heading" className="mt-3 text-4xl sm:text-5xl">
+            <h2
+              id="about-heading"
+              data-testid="about-heading"
+              className="mt-3 text-4xl sm:text-5xl"
+            >
               Hi, I'm Nick Wake.
             </h2>
-            <p data-testid="about-bio" className="mt-6 text-base leading-relaxed text-muted-foreground">
-              I'm a very average amateur photographer, using this website as an opportunity to demonstrate my much more
-              sophisticated test automation skills. Within this repository I'll be flexing my testing muscles with full E2E Playwright,
-              Accessibility, API, Performance and Component tests, all in a format that will hopefully demonstrate my skillset.
+            <p
+              data-testid="about-bio"
+              className="mt-6 text-base leading-relaxed text-muted-foreground"
+            >
+              I'm a very average amateur photographer, using this website as an opportunity to
+              demonstrate my much more sophisticated test automation skills. Within this repository
+              I'll be flexing my testing muscles with full E2E Playwright, Accessibility, API,
+              Performance and Component tests, all in a format that will hopefully demonstrate my
+              skillset.
             </p>
-            <p data-testid="about-bio-secondary" className="mt-4 text-base leading-relaxed text-muted-foreground">
-              That said, if you're hiring a photographer, I'm more than happy to travel around the world taking photos on an iPhone for you!
+            <p
+              data-testid="about-bio-secondary"
+              className="mt-4 text-base leading-relaxed text-muted-foreground"
+            >
+              That said, if you're hiring a photographer, I'm more than happy to travel around the
+              world taking photos on an iPhone for you!
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
