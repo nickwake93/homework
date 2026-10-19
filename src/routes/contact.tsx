@@ -60,7 +60,7 @@ function ContactInfo() {
       <a
         id="contact-phone-link"
         data-testid="contact-phone-link"
-        href="tel:+447700900000"
+        href="tel:+447824553841"
         className="flex items-center gap-3 rounded-lg border border-border bg-card p-5 transition hover:border-foreground/40"
       >
         <Phone className="h-5 w-5 text-accent" />
@@ -84,7 +84,7 @@ function ContactInfo() {
       <a
         id="contact-linkedin-link"
         data-testid="contact-linkedin-link"
-        href="https://www.linkedin.com/m/in/nick-wake"
+        href="https://www.linkedin.com/in/nick-wake"
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center gap-3 rounded-lg border border-border bg-card p-5 transition hover:border-foreground/40"

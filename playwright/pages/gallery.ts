@@ -2,20 +2,21 @@ import type { Page, Locator } from "@playwright/test";
 import { BasePage } from "../support/base";
 
 export class GalleryPage extends BasePage {
-  readonly heading = this.page.getByTestId("gallery-heading");
-  readonly filters = this.page.getByTestId("gallery-filters");
+  readonly heading = this.page.getByRole("heading", { level: 1, name: "Gallery" });
+  readonly filters = this.page.getByRole("tablist", { name: "Filter by category" });
+  // The grid is a plain container with no landmark role.
   readonly container = this.page.getByTestId("gallery-container");
-  readonly cards = this.page.getByTestId("gallery-card");
-  readonly lightbox = this.page.getByTestId("gallery-lightbox");
-  readonly lightboxImage = this.page.getByTestId("lightbox-image");
-  readonly lightboxTitle = this.page.getByTestId("lightbox-title");
-  readonly lightboxCloseButton = this.page.getByTestId("lightbox-close-button");
+  readonly cards = this.container.getByRole("button", { name: /^Open / });
+
+  readonly lightbox = this.page.getByRole("dialog");
+  readonly lightboxImage = this.lightbox.getByRole("img");
+  readonly lightboxCloseButton = this.lightbox.getByRole("button", { name: "Close image viewer" });
 
   constructor(page: Page) {
     super(page, "/gallery");
   }
 
   filterByCategory(category: string): Locator {
-    return this.page.getByTestId(`gallery-filter-${category}`);
+    return this.filters.getByRole("tab", { name: category, exact: true });
   }
 }

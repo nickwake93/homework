@@ -1,30 +1,37 @@
 import { test, expect } from "../support/fixtures";
 
 test.describe("Homepage", () => {
-  test("renders header, carousel, and about section", async ({ home }) => {
+  test("renders header, carousel, and about section", { tag: "@smoke" }, async ({ home }) => {
     await home.checkBaseElements();
   });
 
+  // The carousel auto-advances every 5s but pauses while hovered. Clicking a control
+  // leaves the pointer over the carousel, so each step below starts from a known slide.
   test("carousel next/prev controls advance the active slide", async ({ home }) => {
-    const firstIndex = await home.getCarouselIndex();
+    await home.slideTab(1).click();
+    await home.expectActiveSlide(1);
+
     await home.carouselNextButton.click();
-    await expect
-      .poll(async () => Number(await home.getCarouselIndex()))
-      .toBeGreaterThan(Number(firstIndex));
+    await home.expectActiveSlide(2);
 
-    const secondIndex = await home.getCarouselIndex();
     await home.carouselPrevButton.click();
-    await expect
-      .poll(async () => Number(await home.getCarouselIndex()))
-      .toBeLessThan(Number(secondIndex));
+    await home.expectActiveSlide(1);
   });
 
-  test("pagination dots jump to a specific slide", async ({ home }) => {
-    await home.carouselDots.nth(2).click();
-    await expect(home.carouselDots.nth(2)).toHaveAttribute("data-active", "true");
+  test("previous from the first slide wraps to the last", async ({ home }) => {
+    const total = await home.carouselPagination.getByRole("tab").count();
+    await home.slideTab(1).click();
+
+    await home.carouselPrevButton.click();
+    await home.expectActiveSlide(total);
   });
 
-  test("CTA buttons navigate to the correct routes", async ({ home, page }) => {
+  test("pagination tabs jump to a specific slide", async ({ home }) => {
+    await home.slideTab(3).click();
+    await home.expectActiveSlide(3);
+  });
+
+  test("CTA buttons navigate to the correct routes", { tag: "@smoke" }, async ({ home, page }) => {
     await home.ctaViewGallery.click();
     await expect(page).toHaveURL(/\/gallery$/);
     await page.goBack();
