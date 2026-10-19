@@ -2,11 +2,32 @@ import { test, expect } from "../support/fixtures";
 import { uniqueEmail } from "../support/data";
 
 test.describe("Contact", () => {
-  test("renders contact info with correct hrefs", { tag: "@smoke" }, async ({ contact }) => {
-    await expect(contact.heading).toBeVisible();
-    await expect(contact.phoneLink).toHaveAttribute("href", "tel:+447700900000");
-    await expect(contact.emailLink).toHaveAttribute("href", "mailto:nwake@hey.com");
-    await expect(contact.linkedInLink).toHaveAttribute("href", /linkedin\.com/);
+  // Each link must point where its visible text says it does.
+  const contactLinks = [
+    { link: "phoneLink", shown: "+44 78245 53841", href: "tel:+447824553841" },
+    { link: "emailLink", shown: "nwake@hey.com", href: "mailto:nwake@hey.com" },
+    {
+      link: "linkedInLink",
+      shown: "/in/nick-wake",
+      href: "https://www.linkedin.com/in/nick-wake",
+    },
+  ] as const;
+
+  test(
+    "renders contact info that links to what it shows",
+    { tag: "@smoke" },
+    async ({ contact }) => {
+      await expect(contact.heading).toBeVisible();
+      for (const { link, shown, href } of contactLinks) {
+        await expect(contact[link]).toContainText(shown);
+        await expect(contact[link]).toHaveAttribute("href", href);
+      }
+    },
+  );
+
+  test("LinkedIn opens in a new tab without leaking the opener", async ({ contact }) => {
+    await expect(contact.linkedInLink).toHaveAttribute("target", "_blank");
+    await expect(contact.linkedInLink).toHaveAttribute("rel", /noopener/);
   });
 
   test.describe("Newsletter form", () => {
