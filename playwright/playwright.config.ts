@@ -12,6 +12,10 @@ const ISOLATED_PORT = 4175; // test API on, for tests that clear the shared emai
 
 const UI_SPECS = /specs\/ui\/.*\.spec\.ts/;
 
+// Keep a trace for every failed attempt. PW_TRACE=on records every test (CI's manual
+// "Run workflow" exposes this), at the cost of a much larger report.
+const trace = process.env.PW_TRACE === "on" ? "on" : "retain-on-failure";
+
 export default defineConfig({
   testDir: "./specs",
   timeout: 30_000,
@@ -20,11 +24,17 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI
-    ? [["list"], ["html", { open: "never" }], ["github"]]
+    ? [
+        ["list"],
+        ["html", { open: "never" }],
+        ["github"],
+        // Read by scripts/report-summary.mjs to write the CI job summary.
+        ["json", { outputFile: "test-results/results.json" }],
+      ]
     : [["list"], ["html", { open: "never" }]],
   use: {
     baseURL: externalBaseURL ?? `http://localhost:${PREVIEW_PORT}/`,
-    trace: "on-first-retry",
+    trace,
     screenshot: "only-on-failure",
   },
   // Started in order, so the second server reuses the first one's build.
