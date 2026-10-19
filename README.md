@@ -79,10 +79,19 @@ npm run test:ui
 PLAYWRIGHT_BASE_URL=http://localhost:8080/ npm test
 ```
 
-CI runs on every push and pull request (`.github/workflows/ci.yml`): app typecheck,
-test lint/typecheck/format, then the full suite against a production build. The
-HTML report is uploaded as an artifact, and the latest `main` report is published
-to GitHub Pages.
+CI runs on every push to `main`, every pull request, and on demand
+(`.github/workflows/ci.yml`): app lint/typecheck/format, test lint/typecheck/format, then the
+full suite against a production build.
+
+**Reports:** every run's HTML report is published to GitHub Pages, at `main/` for `main` and
+`pr/<number>/` for each pull request, all listed at
+[nickwake93.github.io/homework](https://nickwake93.github.io/homework/). The run page shows a
+summary (counts per project, failures, flaky tests), and each PR gets a comment with the same
+summary and a link, updated on every push. PR reports are deleted when the PR closes.
+
+**Traces:** CI keeps a trace for every failed attempt. To trace every test, run the workflow
+manually (Actions → CI → Run workflow) with "Record a trace for every test" ticked, or locally
+set `PW_TRACE=on`.
 
 UI specs run in five projects: desktop Chromium, Firefox and WebKit, plus Pixel 7 and
 iPhone 15 emulation. axe scans run in Chromium only, since its rules don't depend on the engine.

@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      trace_all:
+        description: "Record a trace for every test, not just failures (much larger report)"
+        type: boolean
+        default: false
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -15,8 +20,36 @@ jobs:
     name: Lint, typecheck & E2E
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    outputs:
+      report-key: ${{ steps.report.outputs.key }}
+      report-url: ${{ steps.report.outputs.url }}
+      # Only publish when tests actually ran (not e.g. when lint failed first).
+      publish: ${{ steps.report.outputs.publish == 'true' && steps.summary.outputs.written == 'true' }}
     steps:
       - uses: actions/checkout@v5
+
+      # Where this run's report is published: pr/<number>, main, or branch/<name>.
+      - name: Work out report location
+        id: report
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+        run: |
+          if [ -n "$PR_NUMBER" ]; then
+            key="pr/$PR_NUMBER"
+          elif [ "$GITHUB_REF_NAME" = main ]; then
+            key="main"
+          else
+            key="branch/${GITHUB_REF_NAME//[^A-Za-z0-9._-]/-}"
+          fi
+          # Fork PRs get a read-only token, so they can't publish.
+          publish=true
+          if [ -n "$HEAD_REPO" ] && [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]; then publish=false; fi
+          echo "key=$key" >> "$GITHUB_OUTPUT"
+          echo "url=https://${OWNER,,}.github.io/${REPO}/${key}/" >> "$GITHUB_OUTPUT"
+          echo "publish=$publish" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-node@v5
         with:
@@ -61,7 +94,23 @@ jobs:
       # Playwright's webServer builds the app and serves the production bundle.
       - name: Run Playwright tests
         working-directory: playwright
+        env:
+          PW_TRACE: ${{ inputs.trace_all && 'on' || '' }}
         run: npm test
+
+      # The summary goes on the run page and in the PR comment, and is published with the
+      # report (results.json too) so the reports index can show each one's status.
+      - name: Write test summary
+        id: summary
+        if: ${{ !cancelled() && hashFiles('playwright/test-results/results.json') != '' }}
+        working-directory: playwright
+        env:
+          REPORT_URL: ${{ steps.report.outputs.publish == 'true' && steps.report.outputs.url || '' }}
+        run: |
+          node scripts/report-summary.mjs test-results/results.json "$REPORT_URL" > playwright-report/summary.md
+          cp test-results/results.json playwright-report/
+          cat playwright-report/summary.md >> "$GITHUB_STEP_SUMMARY"
+          echo "written=true" >> "$GITHUB_OUTPUT"
 
       - name: Upload HTML report
         if: ${{ !cancelled() }}
@@ -71,26 +120,55 @@ jobs:
           path: playwright/playwright-report/
           retention-days: 14
 
-      - name: Upload report for GitHub Pages
-        if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: playwright/playwright-report/
-
   publish-report:
     name: Publish report
     needs: test
-    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+    if: ${{ !cancelled() && needs.test.outputs.publish == 'true' }}
     runs-on: ubuntu-latest
     permissions:
-      pages: write
-      id-token: write
+      contents: write # push to gh-pages
+      pull-requests: write # comment the report link
+    # Shared with report-cleanup.yml: both rewrite the gh-pages branch.
     concurrency:
-      group: pages
+      group: gh-pages
       cancel-in-progress: false
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      KEY: ${{ needs.test.outputs.report-key }}
+      URL: ${{ needs.test.outputs.report-url }}
     steps:
-      - id: deploy
-        uses: actions/deploy-pages@v4
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: .github/scripts
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: playwright-report
+          path: report
+
+      - name: Publish to GitHub Pages
+        run: |
+          .github/scripts/publish-report.sh publish "$KEY" report
+          echo "Report published to $URL (GitHub Pages can take a minute to update)." >> "$GITHUB_STEP_SUMMARY"
+
+      # One comment per PR, edited on each push rather than adding a new one.
+      - name: Comment on the PR
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          marker="<!-- playwright-report -->"
+          {
+            echo "$marker"
+            cat report/summary.md 2>/dev/null || echo "## Playwright: no results (the run failed before tests finished)"
+            echo
+            echo "<sub>For ${HEAD_SHA::7}. Pages can take a minute to update. All reports: https://${GITHUB_REPOSITORY_OWNER,,}.github.io/${GITHUB_REPOSITORY#*/}/</sub>"
+          } > comment.md
+          id="$(gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" \
+            -q ".[] | select(.body | startswith(\"$marker\")) | .id" | head -n 1)"
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -F body=@comment.md > /dev/null
+          else
+            gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" -F body=@comment.md > /dev/null
+          fi
