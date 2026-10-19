@@ -22,7 +22,7 @@ export function Navbar() {
         id="primary-nav"
         data-testid="primary-nav"
         aria-label="Primary"
-        className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6"
+        className="mx-auto flex max-w-6xl flex-col items-start gap-1 px-4 py-2 sm:h-16 sm:flex-row sm:items-center sm:justify-between sm:gap-0 sm:px-6 sm:py-0"
       >
         <Link
           to="/"
@@ -32,7 +32,8 @@ export function Navbar() {
         >
           Nature<span className="text-accent">Frames</span>
         </Link>
-        <ul className="flex items-center gap-1 sm:gap-2">
+        {/* On narrow screens the links wrap under the logo; -ml-3 lines "Home" up with it. */}
+        <ul className="-ml-3 flex items-center gap-1 sm:ml-0 sm:gap-2">
           {links.map((l) => (
             <li key={l.to}>
               <Link
