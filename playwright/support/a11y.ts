@@ -9,6 +9,17 @@ const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-prac
  * (empty when clean). The full axe results are attached to the test report.
  */
 export async function scanForViolations(page: Page, testInfo: TestInfo): Promise<string[]> {
+  // axe measures colours as rendered, so an element mid-fade (e.g. a toast animating in)
+  // can fail contrast. Let finite animations and transitions finish first; infinite ones
+  // (spinners) never will.
+  await page.waitForFunction(() =>
+    document
+      .getAnimations()
+      .every(
+        (a) => a.playState !== "running" || a.effect?.getComputedTiming().iterations === Infinity,
+      ),
+  );
+
   const results = await new AxeBuilder({ page }).withTags(TAGS).analyze();
 
   await testInfo.attach("axe-results", {

@@ -7,6 +7,9 @@ import { uniqueEmail } from "../../support/data";
 for (const colorScheme of ["light", "dark"] as const) {
   test.describe(`Accessibility (${colorScheme} mode)`, () => {
     test.use({ colorScheme });
+    // axe's rules don't depend on the browser engine, so scanning in every browser only adds
+    // time. Chromium covers both the desktop and mobile layouts.
+    test.skip(({ browserName }) => browserName !== "chromium", "axe scans run in Chromium only");
 
     test("homepage has no axe violations", async ({ home, page }, testInfo) => {
       await expect(home.carousel).toBeVisible();

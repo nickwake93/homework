@@ -69,7 +69,7 @@ cd playwright && npm install && cd ..
 
 ```bash
 cd playwright
-npx playwright install chromium   # one-time
+npx playwright install            # one-time: Chromium, Firefox and WebKit
 npm test                          # builds the app, serves it on :4173, runs headless
 
 # or via the interactive UI:
@@ -84,12 +84,19 @@ test lint/typecheck/format, then the full suite against a production build. The
 HTML report is uploaded as an artifact, and the latest `main` report is published
 to GitHub Pages.
 
+UI specs run in five projects: desktop Chromium, Firefox and WebKit, plus Pixel 7 and
+iPhone 15 emulation. axe scans run in Chromium only, since its rules don't depend on the engine.
+
 Specs live in `playwright/specs/`:
 
 - `ui/home.spec.ts` — header, carousel controls + pagination, CTA navigation
 - `ui/gallery.spec.ts` — grid, category filtering, lightbox open/close (click + Escape)
 - `ui/contact.spec.ts` — contact links, newsletter validation + success
   (verified against `GET /api/test/emails`), star rating, review submission
+- `ui/navigation.spec.ts` — nav links and `aria-current`, logo, theme toggle (incl. persistence
+  and system preference)
+- `ui/responsive.spec.ts` — no horizontal scrolling (incl. WCAG reflow at 320px), nav fits on
+  screen, touch interactions on mobile
 - `ui/accessibility.spec.ts` — axe (WCAG 2.2 AA + best practice) on every route and
   interactive state in light and dark mode, single `h1` per page, lightbox focus management
 - `api/newsletter.spec.ts` — `POST /api/newsletter` contract, validation boundaries,

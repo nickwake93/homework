@@ -56,7 +56,7 @@ jobs:
 
       - name: Install Playwright browsers
         working-directory: playwright
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium firefox webkit
 
       # Playwright's webServer builds the app and serves the production bundle.
       - name: Run Playwright tests
