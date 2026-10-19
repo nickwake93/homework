@@ -1,4 +1,5 @@
-import { expect, FrameLocator, Locator, Page } from "@playwright/test";
+import type { FrameLocator, Locator, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 export async function headingVisibility(
   page: Page | FrameLocator | Locator,
