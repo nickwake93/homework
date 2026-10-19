@@ -8,7 +8,11 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact — Nature Frames" },
-      { name: "description", content: "Get in touch about commissions and prints, subscribe to the newsletter, or leave a review." },
+      {
+        name: "description",
+        content:
+          "Get in touch about commissions and prints, subscribe to the newsletter, or leave a review.",
+      },
     ],
   }),
   component: ContactPage,
@@ -27,7 +31,9 @@ function ContactPage() {
     <div className="mx-auto max-w-5xl px-6 py-16">
       <header className="mb-12">
         <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Contact</p>
-        <h1 data-testid="contact-heading" className="mt-2 text-4xl sm:text-5xl">Let's talk</h1>
+        <h1 data-testid="contact-heading" className="mt-2 text-4xl sm:text-5xl">
+          Let's talk
+        </h1>
         <p className="mt-4 max-w-2xl text-muted-foreground">
           Commissions, prints, or just to say hello — pick whichever channel works best.
         </p>
@@ -48,7 +54,9 @@ function ContactInfo() {
       aria-labelledby="contact-info-heading"
       className="grid gap-4 sm:grid-cols-3"
     >
-      <h2 id="contact-info-heading" className="sr-only">Contact information</h2>
+      <h2 id="contact-info-heading" className="sr-only">
+        Contact information
+      </h2>
       <a
         id="contact-phone-link"
         data-testid="contact-phone-link"
@@ -102,7 +110,8 @@ function NewsletterForm() {
     const e: typeof errors = {};
     if (!name.trim()) e.name = "Name is required";
     if (!email.trim()) e.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Please enter a valid email address";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      e.email = "Please enter a valid email address";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -153,7 +162,9 @@ function NewsletterForm() {
         className="mt-6 grid gap-4 sm:grid-cols-2"
       >
         <div>
-          <label htmlFor="newsletter-name-input" className="mb-1 block text-sm font-medium">Name</label>
+          <label htmlFor="newsletter-name-input" className="mb-1 block text-sm font-medium">
+            Name
+          </label>
           <input
             id="newsletter-name-input"
             data-testid="newsletter-name-input"
@@ -167,13 +178,20 @@ function NewsletterForm() {
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-foreground focus:outline-none"
           />
           {errors.name && (
-            <p id="newsletter-name-error" data-testid="newsletter-name-error" role="alert" className="mt-1 text-xs text-destructive">
+            <p
+              id="newsletter-name-error"
+              data-testid="newsletter-name-error"
+              role="alert"
+              className="mt-1 text-xs text-destructive"
+            >
               {errors.name}
             </p>
           )}
         </div>
         <div>
-          <label htmlFor="newsletter-email-input" className="mb-1 block text-sm font-medium">Email</label>
+          <label htmlFor="newsletter-email-input" className="mb-1 block text-sm font-medium">
+            Email
+          </label>
           <input
             id="newsletter-email-input"
             data-testid="newsletter-email-input"
@@ -187,7 +205,12 @@ function NewsletterForm() {
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-foreground focus:outline-none"
           />
           {errors.email && (
-            <p id="newsletter-email-error" data-testid="newsletter-email-error" role="alert" className="mt-1 text-xs text-destructive">
+            <p
+              id="newsletter-email-error"
+              data-testid="newsletter-email-error"
+              role="alert"
+              className="mt-1 text-xs text-destructive"
+            >
               {errors.email}
             </p>
           )}
@@ -211,7 +234,11 @@ function NewsletterForm() {
             role="status"
             aria-live="polite"
             className={`text-sm ${
-              status === "success" ? "text-accent" : status === "error" ? "text-destructive" : "text-muted-foreground"
+              status === "success"
+                ? "text-accent"
+                : status === "error"
+                  ? "text-destructive"
+                  : "text-muted-foreground"
             }`}
           >
             {message}
@@ -273,7 +300,9 @@ function ReviewsSection() {
       <h2 id="reviews-heading" data-testid="reviews-heading" className="text-3xl">
         Reviews
       </h2>
-      <p className="mt-2 text-sm text-muted-foreground">Worked with me? I'd love to hear about it.</p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Worked with me? I'd love to hear about it.
+      </p>
 
       <form
         id="review-form"
@@ -284,7 +313,9 @@ function ReviewsSection() {
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="review-name-input" className="mb-1 block text-sm font-medium">Your name</label>
+            <label htmlFor="review-name-input" className="mb-1 block text-sm font-medium">
+              Your name
+            </label>
             <input
               id="review-name-input"
               data-testid="review-name-input"
@@ -297,7 +328,12 @@ function ReviewsSection() {
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-foreground focus:outline-none"
             />
             {errors.name && (
-              <p id="review-name-error" data-testid="review-name-error" role="alert" className="mt-1 text-xs text-destructive">
+              <p
+                id="review-name-error"
+                data-testid="review-name-error"
+                role="alert"
+                className="mt-1 text-xs text-destructive"
+              >
                 {errors.name}
               </p>
             )}
@@ -305,9 +341,20 @@ function ReviewsSection() {
           <div>
             <span className="mb-1 block text-sm font-medium">Rating</span>
             <StarRating value={rating} onChange={setRating} idPrefix="review-rating" />
-            <input type="hidden" id="review-rating-value" data-testid="review-rating-value" value={rating} readOnly />
+            <input
+              type="hidden"
+              id="review-rating-value"
+              data-testid="review-rating-value"
+              value={rating}
+              readOnly
+            />
             {errors.rating && (
-              <p id="review-rating-error" data-testid="review-rating-error" role="alert" className="mt-1 text-xs text-destructive">
+              <p
+                id="review-rating-error"
+                data-testid="review-rating-error"
+                role="alert"
+                className="mt-1 text-xs text-destructive"
+              >
                 {errors.rating}
               </p>
             )}
@@ -315,7 +362,9 @@ function ReviewsSection() {
         </div>
 
         <div className="mt-4">
-          <label htmlFor="review-text-input" className="mb-1 block text-sm font-medium">Your review</label>
+          <label htmlFor="review-text-input" className="mb-1 block text-sm font-medium">
+            Your review
+          </label>
           <textarea
             id="review-text-input"
             data-testid="review-text-input"
@@ -328,7 +377,12 @@ function ReviewsSection() {
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-foreground focus:outline-none"
           />
           {errors.text && (
-            <p id="review-text-error" data-testid="review-text-error" role="alert" className="mt-1 text-xs text-destructive">
+            <p
+              id="review-text-error"
+              data-testid="review-text-error"
+              role="alert"
+              className="mt-1 text-xs text-destructive"
+            >
               {errors.text}
             </p>
           )}
@@ -344,18 +398,20 @@ function ReviewsSection() {
             Submit review
           </button>
           {submitted && (
-            <p id="review-success" data-testid="review-success" role="status" aria-live="polite" className="text-sm text-accent">
+            <p
+              id="review-success"
+              data-testid="review-success"
+              role="status"
+              aria-live="polite"
+              className="text-sm text-accent"
+            >
               Review submitted — thank you!
             </p>
           )}
         </div>
       </form>
 
-      <ul
-        id="review-list"
-        data-testid="review-list"
-        className="mt-8 grid gap-4"
-      >
+      <ul id="review-list" data-testid="review-list" className="mt-8 grid gap-4">
         {reviews.map((r) => (
           <li
             key={r.id}
@@ -365,17 +421,32 @@ function ReviewsSection() {
             className="rounded-lg border border-border bg-card p-5"
           >
             <div className="flex items-center justify-between">
-              <p data-testid="review-name" className="font-medium">{r.name}</p>
-              <time data-testid="review-date" dateTime={r.date} className="text-xs text-muted-foreground">
+              <p data-testid="review-name" className="font-medium">
+                {r.name}
+              </p>
+              <time
+                data-testid="review-date"
+                dateTime={r.date}
+                className="text-xs text-muted-foreground"
+              >
                 {new Date(r.date).toLocaleDateString()}
               </time>
             </div>
-            <div data-testid="review-rating" data-rating={r.rating} aria-label={`${r.rating} out of 5 stars`} className="mt-1 flex gap-0.5 text-amber-500">
+            <div
+              data-testid="review-rating"
+              data-rating={r.rating}
+              aria-label={`${r.rating} out of 5 stars`}
+              className="mt-1 flex gap-0.5 text-amber-500"
+            >
               {Array.from({ length: 5 }).map((_, i) => (
-                <span key={i} aria-hidden="true">{i < r.rating ? "★" : "☆"}</span>
+                <span key={i} aria-hidden="true">
+                  {i < r.rating ? "★" : "☆"}
+                </span>
               ))}
             </div>
-            <p data-testid="review-text" className="mt-2 text-sm text-muted-foreground">{r.text}</p>
+            <p data-testid="review-text" className="mt-2 text-sm text-muted-foreground">
+              {r.text}
+            </p>
           </li>
         ))}
       </ul>

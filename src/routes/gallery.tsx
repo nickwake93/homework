@@ -7,7 +7,10 @@ export const Route = createFileRoute("/gallery")({
   head: () => ({
     meta: [
       { title: "Gallery — Nature Frames" },
-      { name: "description", content: "Browse landscape, wildlife, forest, and mountain photography." },
+      {
+        name: "description",
+        content: "Browse landscape, wildlife, forest, and mountain photography.",
+      },
     ],
   }),
   component: GalleryPage,
@@ -19,7 +22,7 @@ function GalleryPage() {
 
   const visible = useMemo(
     () => (active === "All" ? galleryImages : galleryImages.filter((g) => g.category === active)),
-    [active]
+    [active],
   );
 
   useEffect(() => {
@@ -39,7 +42,9 @@ function GalleryPage() {
     <section className="mx-auto max-w-7xl px-6 py-16">
       <header className="mb-10">
         <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Portfolio</p>
-        <h1 data-testid="gallery-heading" className="mt-2 text-4xl sm:text-5xl">Gallery</h1>
+        <h1 data-testid="gallery-heading" className="mt-2 text-4xl sm:text-5xl">
+          Gallery
+        </h1>
       </header>
 
       <div
@@ -133,10 +138,7 @@ function GalleryPage() {
           >
             <X className="h-5 w-5" />
           </button>
-          <figure
-            className="max-h-full max-w-5xl"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <figure className="max-h-full max-w-5xl" onClick={(e) => e.stopPropagation()}>
             <img
               data-testid="lightbox-image"
               src={lightbox.imageUrl}
@@ -144,8 +146,12 @@ function GalleryPage() {
               className="max-h-[80vh] w-auto rounded-lg"
             />
             <figcaption className="mt-4 text-center text-white/80">
-              <span data-testid="lightbox-title" className="font-display text-xl">{lightbox.title}</span>
-              <span className="ml-3 text-xs uppercase tracking-widest text-white/60">{lightbox.category}</span>
+              <span data-testid="lightbox-title" className="font-display text-xl">
+                {lightbox.title}
+              </span>
+              <span className="ml-3 text-xs uppercase tracking-widest text-white/60">
+                {lightbox.category}
+              </span>
             </figcaption>
           </figure>
         </div>
