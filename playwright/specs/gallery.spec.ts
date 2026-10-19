@@ -10,13 +10,15 @@ test.describe("Gallery", () => {
   });
 
   test("category filter narrows the visible cards", async ({ gallery }) => {
-    await gallery.filterByCategory("forests").click();
-    await expect(gallery.filterByCategory("forests")).toHaveAttribute("data-active", "true");
+    const total = await gallery.cards.count();
+    await gallery.filterByCategory("landscapes").click();
+    await expect(gallery.filterByCategory("landscapes")).toHaveAttribute("data-active", "true");
 
     const count = await gallery.cards.count();
     expect(count).toBeGreaterThan(0);
+    expect(count).toBeLessThan(total);
     for (let i = 0; i < count; i++) {
-      await expect(gallery.cards.nth(i)).toHaveAttribute("data-category", "Forests");
+      await expect(gallery.cards.nth(i)).toHaveAttribute("data-category", "Landscapes");
     }
   });
 

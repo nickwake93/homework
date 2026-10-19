@@ -29,11 +29,6 @@ export class ContactPage extends BasePage {
     super(page, "/contact");
   }
 
-  async goto() {
-    await super.goto();
-    await this.heading.waitFor();
-  }
-
   ratingStar(n: number): Locator {
     return this.page.getByTestId(`review-rating-star-${n}`);
   }

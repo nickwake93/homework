@@ -1,6 +1,6 @@
 import { Outlet, createRootRoute, useRouter, HeadContent, Scripts } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
@@ -44,6 +44,14 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const [queryClient] = useState(() => new QueryClient());
+
+  // Signal that React has hydrated and event handlers are attached. Effects run
+  // after the whole tree commits, so this is a reliable "ready" marker for
+  // automation (SSR HTML is visible well before it is interactive).
+  useEffect(() => {
+    document.documentElement.dataset.hydrated = "true";
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <a
