@@ -1,5 +1,5 @@
-import { test, expect } from "../support/fixtures";
-import { uniqueEmail } from "../support/data";
+import { test, expect } from "../../support/fixtures";
+import { uniqueEmail } from "../../support/data";
 
 test.describe("Contact", () => {
   // Each link must point where its visible text says it does.

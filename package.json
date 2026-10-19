@@ -11,7 +11,8 @@
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "dev:qa": "ENABLE_TEST_API=true vite dev"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",

@@ -1,4 +1,4 @@
-import { test, expect } from "../support/fixtures";
+import { test, expect } from "../../support/fixtures";
 
 test.describe("Homepage", () => {
   test("renders header, carousel, and about section", { tag: "@smoke" }, async ({ home }) => {
