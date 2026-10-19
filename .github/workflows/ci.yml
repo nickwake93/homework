@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Lint, typecheck & E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            playwright/package-lock.json
+
+      - name: Install app dependencies
+        run: npm ci
+
+      - name: Install test dependencies
+        working-directory: playwright
+        run: npm ci
+
+      - name: Typecheck app
+        run: npx tsc --noEmit
+
+      - name: Lint tests
+        working-directory: playwright
+        run: npm run lint
+
+      - name: Typecheck tests
+        working-directory: playwright
+        run: npm run typecheck
+
+      - name: Check test formatting
+        working-directory: playwright
+        run: npm run format:check
+
+      - name: Install Playwright browsers
+        working-directory: playwright
+        run: npx playwright install --with-deps chromium
+
+      # Playwright's webServer builds the app and serves the production bundle.
+      - name: Run Playwright tests
+        working-directory: playwright
+        run: npm test
+
+      - name: Upload HTML report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright/playwright-report/
+          retention-days: 14
+
+      - name: Upload report for GitHub Pages
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: playwright/playwright-report/
+
+  publish-report:
+    name: Publish report
+    needs: test
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

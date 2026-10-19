@@ -1,5 +1,8 @@
 # Nature Frames — Photography Portfolio (QA-Ready)
 
+[![CI](https://github.com/nickwake93/homework/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nickwake93/homework/actions/workflows/ci.yml)
+[![Playwright report](https://img.shields.io/badge/Playwright-latest%20report-2EAD33?logo=playwright)](https://nickwake93.github.io/homework/)
+
 A modern, responsive photography portfolio for a recreational nature photographer,
 built with **TanStack Start + React + TypeScript + Tailwind CSS v4**. Designed
 end-to-end for **Playwright / Selenium** automation: every interactive element
@@ -58,20 +61,24 @@ npm install
 cd playwright && npm install && cd ..
 ```
 
-## Running the Playwright smoke tests
+## Running the Playwright tests
 
 ```bash
 cd playwright
 npx playwright install chromium   # one-time
-npm run dev                       # start the app (http://localhost:8080), in another terminal
-npm run test                      # runs headless
+npm test                          # builds the app, serves it on :4173, runs headless
 
 # or via the interactive UI:
 npm run test:ui
 
-# or against a deployed preview:
-PLAYWRIGHT_BASE_URL=https://your.url npm run test
+# or against an app that's already running (e.g. `npm run dev` on :8080, or a deployment):
+PLAYWRIGHT_BASE_URL=http://localhost:8080/ npm test
 ```
+
+CI runs on every push and pull request (`.github/workflows/ci.yml`): app typecheck,
+test lint/typecheck/format, then the full suite against a production build. The
+HTML report is uploaded as an artifact, and the latest `main` report is published
+to GitHub Pages.
 
 Specs live in `playwright/specs/` and cover:
 
