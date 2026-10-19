@@ -1,4 +1,4 @@
-import { test, expect } from "../support/fixtures";
+import { test, expect } from "../../support/fixtures";
 
 test.describe("Gallery", () => {
   test("renders gallery heading, filters, and cards", { tag: "@smoke" }, async ({ gallery }) => {

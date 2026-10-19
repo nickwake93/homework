@@ -24,6 +24,10 @@ has a stable `id`, a `data-testid`, and an accessible label.
 | GET    | `/api/test/emails` | Returns all sent emails (for QA verification) |
 | DELETE | `/api/test/emails` | Clears the in-memory mock email store         |
 
+The `/api/test/*` endpoints expose and wipe subscriber emails, so they only exist when
+`ENABLE_TEST_API=true` (set by the Playwright web server and `npm run dev:qa`). Without it
+they respond 404, as they will in production.
+
 ## Configuring images
 
 All gallery and hero images are defined in **`src/lib/gallery-data.ts`**.
@@ -71,7 +75,7 @@ npm test                          # builds the app, serves it on :4173, runs hea
 # or via the interactive UI:
 npm run test:ui
 
-# or against an app that's already running (e.g. `npm run dev` on :8080, or a deployment):
+# or against an app that's already running (e.g. `npm run dev:qa` on :8080, or a deployment):
 PLAYWRIGHT_BASE_URL=http://localhost:8080/ npm test
 ```
 
@@ -80,9 +84,12 @@ test lint/typecheck/format, then the full suite against a production build. The
 HTML report is uploaded as an artifact, and the latest `main` report is published
 to GitHub Pages.
 
-Specs live in `playwright/specs/` and cover:
+Specs live in `playwright/specs/`:
 
-- `home.spec.ts` — header, carousel controls + pagination, CTA navigation
-- `gallery.spec.ts` — grid, category filtering, lightbox open/close (click + Escape)
-- `contact.spec.ts` — contact link `href`s, newsletter validation + success
+- `ui/home.spec.ts` — header, carousel controls + pagination, CTA navigation
+- `ui/gallery.spec.ts` — grid, category filtering, lightbox open/close (click + Escape)
+- `ui/contact.spec.ts` — contact links, newsletter validation + success
   (verified against `GET /api/test/emails`), star rating, review submission
+- `api/newsletter.spec.ts` — `POST /api/newsletter` contract, validation boundaries,
+  malformed bodies, 405 for other methods
+- `api/test-api*.spec.ts` — the QA endpoints, including that they 404 with the flag off
