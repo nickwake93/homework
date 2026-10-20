@@ -32,7 +32,8 @@ export default [
       "playwright/no-raw-locators": ["error", { allowed: ["html"] }],
       "playwright/valid-expect": "error",
       "playwright/prefer-web-first-assertions": "error",
-      "playwright/no-skipped-test": ["warn", { allowConditional: true }],
+      // Scope tests to browsers with testIgnore in playwright.config.ts, not test.skip.
+      "playwright/no-skipped-test": "error",
       "playwright/expect-expect": "off", // We often use helper functions that contain the assertions
     },
   },

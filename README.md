@@ -31,7 +31,7 @@ I'm open about this, because how a project was made matters when you're judging 
 
 |              |                                                                                                         |
 | ------------ | ------------------------------------------------------------------------------------------------------- |
-| **Tests**    | 50 UI tests × 5 browser projects, plus 28 API tests: 278 runs in about 3 minutes                        |
+| **Tests**    | UI tests in 5 browser projects plus API tests: 228 runs, none skipped, in about 3 minutes               |
 | **Browsers** | Chromium, Firefox, WebKit; Pixel 7 and iPhone 15 emulation                                              |
 | **Layers**   | UI journeys, API contract and edge cases, axe (WCAG 2.2 AA), responsive and reflow, image weight budget |
 | **CI**       | Lint, typecheck and format, a smoke-test gate, then the full suite against a production build           |
