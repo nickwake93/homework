@@ -31,20 +31,22 @@ and one public API endpoint. The goals for its test suite:
 
 ## Test layers
 
-| Layer         | Spec                       | Tests | Runs in                    | Covers                                                                                                                          |
-| ------------- | -------------------------- | ----: | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| UI            | `ui/home.spec.ts`          |     5 | all 5 browser projects     | Carousel controls, pagination, wraparound, CTAs                                                                                 |
-| UI            | `ui/gallery.spec.ts`       |     4 | all 5                      | Filtering, lightbox open/close by click and Escape                                                                              |
-| UI            | `ui/contact.spec.ts`       |     8 | all 5                      | Contact links, newsletter and review forms (validation, success, email sent)                                                    |
-| UI            | `ui/navigation.spec.ts`    |     4 | all 5                      | Nav links and `aria-current`, logo, theme toggle and persistence                                                                |
-| Accessibility | `ui/accessibility.spec.ts` |    18 | axe: Chromium; rest: all 5 | axe (WCAG 2.2 AA + best practice) on every page and state, in light and dark mode; one `h1` per page; lightbox focus management |
-| Responsive    | `ui/responsive.spec.ts`    |     9 | all 5; touch on phones     | No horizontal scrolling, WCAG reflow at 320px, nav fits, tap interactions                                                       |
-| Performance   | `ui/performance.spec.ts`   |     2 | desktop Chromium           | Image weight budget (no image over 1MB)                                                                                         |
-| API           | `api/newsletter.spec.ts`   |    23 | no browser                 | Response contract, email recorded, trimming, length boundaries, 15 invalid requests, 405s                                       |
-| API           | `api/test-api*.spec.ts`    |     5 | no browser                 | QA endpoints list and clear emails, and 404 when switched off                                                                   |
+| Layer         | Spec                       | Tests | Runs in                      | Covers                                                                                    |
+| ------------- | -------------------------- | ----: | ---------------------------- | ----------------------------------------------------------------------------------------- |
+| UI            | `ui/home.spec.ts`          |     5 | all 5 browser projects       | Carousel controls, pagination, wraparound, CTAs                                           |
+| UI            | `ui/gallery.spec.ts`       |     4 | all 5                        | Filtering, lightbox open/close by click and Escape                                        |
+| UI            | `ui/contact.spec.ts`       |     8 | all 5                        | Contact links, newsletter and review forms (validation, success, email sent)              |
+| UI            | `ui/navigation.spec.ts`    |     4 | all 5                        | Nav links and `aria-current`, logo, theme toggle and persistence                          |
+| Accessibility | `ui/axe.spec.ts`           |    12 | Chromium, desktop and mobile | axe (WCAG 2.2 AA + best practice) on every page and state, in light and dark mode         |
+| Accessibility | `ui/accessibility.spec.ts` |     6 | all 5                        | One `h1` per page; lightbox focus management                                              |
+| Responsive    | `ui/responsive.spec.ts`    |     7 | all 5                        | No horizontal scrolling, WCAG reflow at 320px, nav fits                                   |
+| Responsive    | `ui/touch.spec.ts`         |     2 | phones                       | Tap interactions                                                                          |
+| Performance   | `ui/performance.spec.ts`   |     2 | desktop Chromium             | Image weight budget (no image over 1MB)                                                   |
+| API           | `api/newsletter.spec.ts`   |    23 | no browser                   | Response contract, email recorded, trimming, length boundaries, 15 invalid requests, 405s |
+| API           | `api/test-api*.spec.ts`    |     5 | no browser                   | QA endpoints list and clear emails, and 404 when switched off                             |
 
-That's 50 UI tests run in each of 5 browser projects plus 28 API tests: **278 test runs** in
-about 3 minutes in CI. Seven critical-path UI tests are tagged `@smoke` (`npm run test:smoke`).
+That's 34 UI tests run in every browser project, the 16 more specialised ones only where they
+mean something, and 28 API tests: **228 test runs** in about 3 minutes in CI, none skipped. Seven critical-path UI tests are tagged `@smoke` (`npm run test:smoke`).
 CI runs them in Chromium first, as a gate: if any fails, the full suite doesn't run, because a
 broken critical path would only produce hundreds of failures that say the same thing.
 
@@ -75,6 +77,20 @@ Each one is a separate process with its own in-memory email store:
 | 4173 | on                | `chromium`, `firefox`, `webkit`, `mobile-chrome`, `mobile-safari`, `api` | The main suite                                                        |
 | 4174 | off               | `api-prod-like`                                                          | Proves the QA endpoints don't exist with production config            |
 | 4175 | on                | `api-isolated` (1 worker)                                                | The test that wipes the email store, so it can't affect anything else |
+
+Not every spec belongs in every project. Rather than calling `test.skip`, which still schedules
+the test and reports it as skipped, each project leaves out what doesn't apply with `testIgnore`,
+so the config shows in one place what runs where:
+
+| Spec                  | chromium | firefox | webkit | mobile-chrome | mobile-safari | Why                                          |
+| --------------------- | :------: | :-----: | :----: | :-----------: | :-----------: | -------------------------------------------- |
+| other UI specs        |    ✓     |    ✓    |   ✓    |       ✓       |       ✓       | Behaviour can differ by engine and size      |
+| `axe.spec.ts`         |    ✓     |         |        |       ✓       |               | axe's rules don't depend on the engine       |
+| `performance.spec.ts` |    ✓     |         |        |               |               | Image file sizes don't depend on the browser |
+| `touch.spec.ts`       |          |         |        |       ✓       |       ✓       | Desktop projects have no touchscreen         |
+
+A lint rule (`playwright/no-skipped-test`) fails on any `test.skip`, so a skipped test can't
+slip into the suite unnoticed.
 
 Mobile projects emulate a Pixel 7 and an iPhone 15. Setting `PLAYWRIGHT_BASE_URL` skips the
 web servers and runs against an existing app; the two projects that need their own servers are

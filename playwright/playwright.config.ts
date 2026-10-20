@@ -11,6 +11,11 @@ const PROD_LIKE_PORT = 4174; // test API off, as in production
 const ISOLATED_PORT = 4175; // test API on, for tests that clear the shared email store
 
 const UI_SPECS = /specs\/ui\/.*\.spec\.ts/;
+// UI specs that only belong in some projects. Projects leave them out with testIgnore, rather
+// than the specs calling test.skip, so nothing is scheduled just to be skipped.
+const AXE = /specs\/ui\/axe\.spec\.ts/; // axe's rules don't depend on the engine: Chromium only
+const IMAGE_BUDGET = /specs\/ui\/performance\.spec\.ts/; // file sizes: desktop Chromium only
+const TOUCH = /specs\/ui\/touch\.spec\.ts/; // phones only
 
 // Keep a trace for every failed attempt. PW_TRACE=on records every test (CI's manual
 // "Run workflow" exposes this), at the cost of a much larger report.
@@ -71,11 +76,36 @@ export default defineConfig({
         },
       ],
   projects: [
-    { name: "chromium", testMatch: UI_SPECS, use: { ...devices["Desktop Chrome"] } },
-    { name: "firefox", testMatch: UI_SPECS, use: { ...devices["Desktop Firefox"] } },
-    { name: "webkit", testMatch: UI_SPECS, use: { ...devices["Desktop Safari"] } },
-    { name: "mobile-chrome", testMatch: UI_SPECS, use: { ...devices["Pixel 7"] } },
-    { name: "mobile-safari", testMatch: UI_SPECS, use: { ...devices["iPhone 15"] } },
+    {
+      name: "chromium",
+      testMatch: UI_SPECS,
+      testIgnore: [TOUCH],
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "firefox",
+      testMatch: UI_SPECS,
+      testIgnore: [AXE, IMAGE_BUDGET, TOUCH],
+      use: { ...devices["Desktop Firefox"] },
+    },
+    {
+      name: "webkit",
+      testMatch: UI_SPECS,
+      testIgnore: [AXE, IMAGE_BUDGET, TOUCH],
+      use: { ...devices["Desktop Safari"] },
+    },
+    {
+      name: "mobile-chrome",
+      testMatch: UI_SPECS,
+      testIgnore: [IMAGE_BUDGET],
+      use: { ...devices["Pixel 7"] },
+    },
+    {
+      name: "mobile-safari",
+      testMatch: UI_SPECS,
+      testIgnore: [AXE, IMAGE_BUDGET],
+      use: { ...devices["iPhone 15"] },
+    },
     {
       // HTTP-only: these specs use the `request` fixture, so no browser is launched.
       name: "api",

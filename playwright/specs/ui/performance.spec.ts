@@ -4,12 +4,8 @@ import { test, expect } from "../../support/fixtures";
 // the gallery downloaded ~37MB. Resized photos are ~250–750KB.
 const MAX_IMAGE_BYTES = 1024 * 1024;
 
+// Runs in desktop Chromium only, as image sizes don't depend on the browser.
 test.describe("Image weight budget", () => {
-  test.skip(
-    ({ browserName, isMobile }) => browserName !== "chromium" || isMobile,
-    "one engine is enough",
-  );
-
   for (const path of ["/", "/gallery"]) {
     test(`every image on ${path} is under 1MB`, async ({ page, request }) => {
       await page.goto(path);
