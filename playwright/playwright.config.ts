@@ -1,11 +1,14 @@
 import { defineConfig, devices } from "@playwright/test";
 
 // Point at an already-running app (e.g. `npm run dev:qa` on :8080, or a deployed
-// URL) with PLAYWRIGHT_BASE_URL. Otherwise Playwright builds the app and serves
-// the production bundle itself.
+// URL) with PLAYWRIGHT_BASE_URL. Otherwise Playwright builds the app and serves the
+// Worker in Cloudflare's local runtime (wrangler dev), the same build that's deployed.
 const externalBaseURL = process.env.PLAYWRIGHT_BASE_URL;
+// Set when PLAYWRIGHT_BASE_URL is the live site, so the checks that the test API is off run
+// against it too (CI does this after each deploy).
+const targetIsProduction = process.env.PLAYWRIGHT_TARGET === "production";
 const PREVIEW_PORT = 4173;
-// Extra servers from the same build. Each preview process has its own in-memory email
+// Extra servers from the same build. Each server process has its own in-memory email
 // store, so tests that need a different config or that wipe state get a server to themselves.
 const PROD_LIKE_PORT = 4174; // test API off, as in production
 const ISOLATED_PORT = 4175; // test API on, for tests that clear the shared email store
@@ -46,31 +49,29 @@ export default defineConfig({
     trace,
     screenshot: "only-on-failure",
   },
-  // Started in order, so the second server reuses the first one's build.
+  // Started in order, so the later servers reuse the first one's build. The Worker reads
+  // ENABLE_TEST_API from its bindings, not the shell, hence --var.
   webServer: externalBaseURL
     ? undefined
     : [
         {
-          command: `${build}npm run preview -- --port ${PREVIEW_PORT} --strictPort`,
+          command: `${build}npm run preview -- --port ${PREVIEW_PORT} --var ENABLE_TEST_API:true`,
           cwd: "..",
           url: `http://localhost:${PREVIEW_PORT}/`,
-          env: { ENABLE_TEST_API: "true" },
           reuseExistingServer: !process.env.CI,
           timeout: 120_000,
         },
         {
-          command: `npm run preview -- --port ${PROD_LIKE_PORT} --strictPort`,
+          command: `npm run preview -- --port ${PROD_LIKE_PORT} --var ENABLE_TEST_API:false`,
           cwd: "..",
           url: `http://localhost:${PROD_LIKE_PORT}/`,
-          env: { ENABLE_TEST_API: "false" },
           reuseExistingServer: !process.env.CI,
           timeout: 60_000,
         },
         {
-          command: `npm run preview -- --port ${ISOLATED_PORT} --strictPort`,
+          command: `npm run preview -- --port ${ISOLATED_PORT} --var ENABLE_TEST_API:true`,
           cwd: "..",
           url: `http://localhost:${ISOLATED_PORT}/`,
-          env: { ENABLE_TEST_API: "true" },
           reuseExistingServer: !process.env.CI,
           timeout: 60_000,
         },
@@ -112,9 +113,17 @@ export default defineConfig({
       testMatch: /specs\/api\/.*\.spec\.ts/,
       testIgnore: /test-api-(reset|disabled)\.spec\.ts/,
     },
-    // These need servers Playwright starts itself, so they're skipped against an external URL.
+    // These need servers Playwright starts itself, so against an external URL they're left
+    // out, except the test-API-off checks when that URL is production.
     ...(externalBaseURL
-      ? []
+      ? targetIsProduction
+        ? [
+            {
+              name: "api-prod-like",
+              testMatch: /specs\/api\/test-api-disabled\.spec\.ts/,
+            },
+          ]
+        : []
       : [
           {
             name: "api-prod-like",

@@ -46,7 +46,8 @@ and one public API endpoint. The goals for its test suite:
 | API           | `api/test-api*.spec.ts`    |     5 | no browser                   | QA endpoints list and clear emails, and 404 when switched off                             |
 
 That's 34 UI tests run in every browser project, the 16 more specialised ones only where they
-mean something, and 28 API tests: **228 test runs** in about 3 minutes in CI, none skipped. Seven critical-path UI tests are tagged `@smoke` (`npm run test:smoke`).
+mean something, and 28 API tests: **228 test runs** in about 3 minutes in CI, none skipped. Seven critical-path UI tests, and the two checks that the test-only API is off, are tagged
+`@smoke` (`npm run test:smoke`).
 CI runs them in Chromium first, as a gate: if any fails, the full suite doesn't run, because a
 broken critical path would only produce hundreds of failures that say the same thing.
 
@@ -69,7 +70,8 @@ playwright/
 
 ### Projects and servers
 
-Playwright builds the app once and serves the production bundle from three preview servers.
+Playwright builds the app once, as a Cloudflare Worker, and serves it from three local servers
+running Cloudflare's runtime (`wrangler dev`), so the tests run against exactly what's deployed.
 Each one is a separate process with its own in-memory email store:
 
 | Port | `ENABLE_TEST_API` | Projects                                                                 | Why                                                                   |
@@ -94,7 +96,8 @@ slip into the suite unnoticed.
 
 Mobile projects emulate a Pixel 7 and an iPhone 15. Setting `PLAYWRIGHT_BASE_URL` skips the
 web servers and runs against an existing app; the two projects that need their own servers are
-dropped automatically.
+dropped automatically. With `PLAYWRIGHT_TARGET=production` as well, as CI sets after each deploy,
+`api-prod-like` stays and checks the live site's test API is off.
 
 ## Design decisions
 
@@ -157,6 +160,11 @@ Two of the original tests were wrong rather than the app: one filtered the galle
 placeholder category that no longer existed, and one asserted the placeholder phone number, so it
 was effectively protecting a bug. Both were corrected.
 
+Setting up the deploy turned up one more: **the tests had never run against the build that
+would be deployed.** Lovable's build config only builds a Cloudflare Worker inside Lovable's own
+sandbox; everywhere else it quietly made a Node server instead. The build now always makes the
+Worker, and the suite runs it in Cloudflare's local runtime.
+
 ## Reliability
 
 New and changed tests are run with `--repeat-each=5 --retries=0` before merging (for example,
@@ -182,7 +190,6 @@ the suite handles them:
 | Performance beyond image weight | Lighthouse budgets (LCP, CLS, total weight) are the natural next step. On the roadmap.                                                                                      |
 | Component tests                 | The site's About section mentions them; they'd suit `StarRating` and the carousel. On the roadmap.                                                                          |
 | Real email delivery             | Emails go to an in-memory store, which proves the app _tried_ to send the right email. A real provider plus a test inbox (e.g. Mailpit) would cover delivery and rendering. |
-| Post-deploy smoke tests         | The app isn't deployed yet. `@smoke` tags and `PLAYWRIGHT_BASE_URL` are ready for when it is.                                                                               |
 | axe in Firefox and WebKit       | Same rules, same results; Chromium covers it (see design decisions).                                                                                                        |
 | Load and security testing       | Out of scope for a static portfolio with one form endpoint.                                                                                                                 |
 

@@ -1,7 +1,11 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "tanstack-start-app",
+  "name": "nature-frames",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "src/server.ts",
+  // The build (Nitro, enabled in vite.config.ts) generates the Worker entry and assets config
+  // in dist/server/wrangler.json from this file; wrangler dev and deploy then use that.
+  "routes": [{ "pattern": "photos.nickwake.uk", "custom_domain": true }],
+  // One public address: the custom domain, not also nature-frames.<account>.workers.dev.
+  "workers_dev": false,
 }
