@@ -16,6 +16,10 @@ const UI_SPECS = /specs\/ui\/.*\.spec\.ts/;
 // "Run workflow" exposes this), at the cost of a much larger report.
 const trace = process.env.PW_TRACE === "on" ? "on" : "retain-on-failure";
 
+// CI builds the app in its own step and runs Playwright twice (smoke, then everything), so it
+// sets PW_PREBUILT to skip rebuilding for each run.
+const build = process.env.PW_PREBUILT ? "" : "npm run build && ";
+
 export default defineConfig({
   testDir: "./specs",
   timeout: 30_000,
@@ -42,7 +46,7 @@ export default defineConfig({
     ? undefined
     : [
         {
-          command: `npm run build && npm run preview -- --port ${PREVIEW_PORT} --strictPort`,
+          command: `${build}npm run preview -- --port ${PREVIEW_PORT} --strictPort`,
           cwd: "..",
           url: `http://localhost:${PREVIEW_PORT}/`,
           env: { ENABLE_TEST_API: "true" },

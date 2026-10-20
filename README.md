@@ -34,7 +34,7 @@ I'm open about this, because how a project was made matters when you're judging 
 | **Tests**    | 50 UI tests × 5 browser projects, plus 28 API tests: 278 runs in about 3 minutes                        |
 | **Browsers** | Chromium, Firefox, WebKit; Pixel 7 and iPhone 15 emulation                                              |
 | **Layers**   | UI journeys, API contract and edge cases, axe (WCAG 2.2 AA), responsive and reflow, image weight budget |
-| **CI**       | Lint, typecheck and format for app and tests, then the full suite against a production build            |
+| **CI**       | Lint, typecheck and format, a smoke-test gate, then the full suite against a production build           |
 | **Reports**  | Every run's HTML report hosted on GitHub Pages, with traces for failures and a summary on each PR       |
 
 ## Quick start
@@ -66,6 +66,13 @@ tests use.
 ## CI and reports
 
 CI (`.github/workflows/ci.yml`) runs on every push to `main`, every pull request, and on demand.
+Each stage only runs if the one before it passed:
+
+1. **Static checks:** lint, typecheck and format check, for the app and then the tests
+2. **Build** the app once
+3. **Smoke gate:** the 7 `@smoke` tests in Chromium. If the app is broken, CI fails here in
+   seconds and skips the full suite.
+4. **Full suite:** every test in every project, smoke tests included, so the report is complete
 
 - **Reports:** each run's HTML report is published to GitHub Pages: `main/` for `main`,
   `pr/<number>/` for pull requests, all listed at

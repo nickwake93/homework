@@ -45,6 +45,8 @@ and one public API endpoint. The goals for its test suite:
 
 That's 50 UI tests run in each of 5 browser projects plus 28 API tests: **278 test runs** in
 about 3 minutes in CI. Seven critical-path UI tests are tagged `@smoke` (`npm run test:smoke`).
+CI runs them in Chromium first, as a gate: if any fails, the full suite doesn't run, because a
+broken critical path would only produce hundreds of failures that say the same thing.
 
 ## How the suite is put together
 

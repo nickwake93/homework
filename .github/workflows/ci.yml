@@ -91,10 +91,24 @@ jobs:
         working-directory: playwright
         run: npx playwright install --with-deps chromium firefox webkit
 
-      # Playwright's webServer builds the app and serves the production bundle.
-      - name: Run Playwright tests
+      - name: Build app
+        run: npm run build
+
+      # A quick gate: the critical-path tests in one browser. If the app is broken, this fails
+      # in seconds and the full suite (and its minutes) is skipped.
+      - name: Run smoke tests
+        id: smoke
         working-directory: playwright
         env:
+          PW_PREBUILT: "true"
+          PW_TRACE: ${{ inputs.trace_all && 'on' || '' }}
+        run: npm run test:smoke -- --project chromium
+
+      # Every project, smoke tests included, so the published report is the complete picture.
+      - name: Run full suite
+        working-directory: playwright
+        env:
+          PW_PREBUILT: "true"
           PW_TRACE: ${{ inputs.trace_all && 'on' || '' }}
         run: npm test
 
@@ -106,6 +120,8 @@ jobs:
         working-directory: playwright
         env:
           REPORT_URL: ${{ steps.report.outputs.publish == 'true' && steps.report.outputs.url || '' }}
+          # When the smoke gate failed, the results are from the smoke run alone.
+          SMOKE_ONLY: ${{ steps.smoke.outcome == 'failure' }}
         run: |
           node scripts/report-summary.mjs test-results/results.json "$REPORT_URL" > playwright-report/summary.md
           cp test-results/results.json playwright-report/
