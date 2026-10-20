@@ -1,5 +1,7 @@
 // Turns Playwright's JSON report into a Markdown summary for the CI job summary and PR comment.
 // Usage: node scripts/report-summary.mjs <results.json> [report-url]
+// Set SMOKE_ONLY=true when the results come from a failed smoke gate, so the summary says the
+// full suite didn't run.
 import { readFileSync } from "node:fs";
 
 const [resultsPath, reportUrl] = process.argv.slice(2);
@@ -33,8 +35,9 @@ for (const suite of report.suites) walk(suite, []);
 const failed = tests.filter((t) => t.status === "unexpected");
 const flaky = tests.filter((t) => t.status === "flaky");
 
+const smokeOnly = process.env.SMOKE_ONLY === "true";
 const headline = failed.length
-  ? `❌ ${failed.length} failed`
+  ? `❌ ${failed.length} failed${smokeOnly ? " in smoke tests, full suite not run" : ""}`
   : `✅ ${stats.expected} passed${flaky.length ? `, ⚠️ ${flaky.length} flaky` : ""}`;
 
 const lines = [`## Playwright: ${headline}`, ""];
