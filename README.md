@@ -3,6 +3,8 @@
 [![CI](https://github.com/nickwake93/nature-frames-qa/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/nickwake93/nature-frames-qa/actions/workflows/ci.yml)
 [![Playwright report](https://img.shields.io/badge/Playwright-latest%20report-2EAD33?logo=playwright)](https://nickwake93.github.io/nature-frames-qa/main/)
 
+**Live site: [photos.nickwake.uk](https://photos.nickwake.uk)**
+
 This repo shows how I approach test engineering. It contains a small photography portfolio
 site, which is the system under test, and the Playwright framework that tests it: UI, API,
 accessibility, responsive and performance checks, run across three browser engines and two
@@ -34,7 +36,7 @@ I'm open about this, because how a project was made matters when you're judging 
 | **Tests**    | UI tests in 5 browser projects plus API tests: 228 runs, none skipped, in about 3 minutes               |
 | **Browsers** | Chromium, Firefox, WebKit; Pixel 7 and iPhone 15 emulation                                              |
 | **Layers**   | UI journeys, API contract and edge cases, axe (WCAG 2.2 AA), responsive and reflow, image weight budget |
-| **CI**       | Lint, typecheck and format, a smoke-test gate, then the full suite against a production build           |
+| **CI/CD**    | Static checks, a smoke-test gate, the full suite, then deploy to Cloudflare and smoke-test production   |
 | **Reports**  | Every run's HTML report hosted on GitHub Pages, with traces for failures and a summary on each PR       |
 
 ## Quick start
@@ -53,7 +55,7 @@ Other ways to run:
 
 ```bash
 npm run test:ui          # Playwright UI mode
-npm run test:smoke       # the 7 @smoke critical-path tests
+npm run test:smoke       # the @smoke critical-path tests
 npx playwright test --project webkit specs/ui/gallery.spec.ts
 
 # Against an app that's already running, e.g. `npm run dev:qa` from the repo root (port 8080):
@@ -73,6 +75,10 @@ Each stage only runs if the one before it passed:
 3. **Smoke gate:** the 7 `@smoke` tests in Chromium. If the app is broken, CI fails here in
    seconds and skips the full suite.
 4. **Full suite:** every test in every project, smoke tests included, so the report is complete
+5. **Deploy** (`main` only): the same Worker build goes to Cloudflare, at
+   [photos.nickwake.uk](https://photos.nickwake.uk)
+6. **Smoke-test production:** the `@smoke` tests run against the live site in every browser,
+   along with checks that the test-only API is switched off. They only read, never submit forms.
 
 - **Reports:** each run's HTML report is published to GitHub Pages: `main/` for `main`,
   `pr/<number>/` for pull requests, all listed at
@@ -104,7 +110,9 @@ TESTING.md            test strategy, design decisions, bugs found
 ## The app
 
 A portfolio site for a recreational photographer, built with **TanStack Start**, **React**,
-**TypeScript** and **Tailwind CSS**, and server-rendered.
+**TypeScript** and **Tailwind CSS**, server-rendered on **Cloudflare Workers**. The build makes
+the Worker, and `npm run preview` serves it locally in Cloudflare's runtime (`wrangler dev`), so
+the tests run against exactly what's deployed.
 
 | Route      | What's there                                                            |
 | ---------- | ----------------------------------------------------------------------- |
@@ -127,8 +135,8 @@ test fails otherwise.
 
 ## Roadmap
 
-- [ ] **Deploy to Cloudflare** (the app is already configured for it via `wrangler.jsonc`), add a
-      live link here, and run the `@smoke` tests against the deployment after each release
+- [x] **Deploy to Cloudflare** from `main`, and run the `@smoke` tests against the live site after
+      each deploy
 - [ ] **Visual regression** tests, with baselines generated in Docker so they match CI
 - [ ] **Lighthouse performance budgets** (LCP, CLS, total page weight)
 - [ ] **Component tests** for `StarRating` and the carousel
