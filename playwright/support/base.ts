@@ -1,14 +1,17 @@
 import { expect, type Page } from "@playwright/test";
+import { SiteFooter } from "../pages/components/siteFooter";
 import { SiteNav } from "../pages/components/siteNav";
 
 export abstract class BasePage {
   readonly nav: SiteNav;
+  readonly footer: SiteFooter;
 
   constructor(
     readonly page: Page,
     private readonly path: string,
   ) {
     this.nav = new SiteNav(page);
+    this.footer = new SiteFooter(page);
   }
 
   /**

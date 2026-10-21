@@ -28,6 +28,20 @@ test.describe("Primary navigation", () => {
   });
 });
 
+test.describe("Footer", () => {
+  // Visitors who land on the site directly should be able to find the project behind it.
+  test("links to the GitHub repo and the latest test report", async ({ gallery }) => {
+    await expect(gallery.footer.repoLink).toHaveAttribute(
+      "href",
+      "https://github.com/nickwake93/nature-frames-qa",
+    );
+    await expect(gallery.footer.reportLink).toHaveAttribute(
+      "href",
+      "https://nickwake93.github.io/nature-frames-qa/main/",
+    );
+  });
+});
+
 test.describe("Theme toggle", () => {
   test.describe("with a light system preference", () => {
     test.use({ colorScheme: "light" });
