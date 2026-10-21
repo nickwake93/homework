@@ -33,7 +33,7 @@ I'm open about this, because how a project was made matters when you're judging 
 
 |              |                                                                                                         |
 | ------------ | ------------------------------------------------------------------------------------------------------- |
-| **Tests**    | UI tests in 5 browser projects plus API tests: 228 runs, none skipped, in about 3 minutes               |
+| **Tests**    | UI tests in 5 browser projects plus API tests: 233 runs, none skipped, in about 3 minutes               |
 | **Browsers** | Chromium, Firefox, WebKit; Pixel 7 and iPhone 15 emulation                                              |
 | **Layers**   | UI journeys, API contract and edge cases, axe (WCAG 2.2 AA), responsive and reflow, image weight budget |
 | **CI/CD**    | Static checks, a smoke-test gate, the full suite, then deploy to Cloudflare and smoke-test production   |
